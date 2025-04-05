@@ -9,7 +9,7 @@ import subprocess
 from PIL import Image
 
 # Configure Gemini API
-genai.configure(api_key="")
+genai.configure(api_key="") # Add your Gemini API key here
 model = genai.GenerativeModel("gemini-1.5-pro-latest")
 
 reader = easyocr.Reader(['en'])

@@ -7,9 +7,11 @@ from flask import send_from_directory
 import uuid
 import subprocess
 from PIL import Image
+from dotenv import load_dotenv
 
-# Configure Gemini API
-genai.configure(api_key="") # Add your Gemini API key here
+load_dotenv()
+api_key = os.getenv("API_KEY")
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-1.5-pro-latest")
 
 reader = easyocr.Reader(['en'])

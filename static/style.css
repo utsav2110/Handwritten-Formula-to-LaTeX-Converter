@@ -195,7 +195,7 @@ textarea {
 /* New styles for better responsiveness */
 .button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     margin: 20px 0;
     flex-wrap: wrap;
     gap: 10px;

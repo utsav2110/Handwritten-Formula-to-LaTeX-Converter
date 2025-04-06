@@ -8,6 +8,8 @@ import uuid
 import subprocess
 from PIL import Image
 from dotenv import load_dotenv
+import PyPDF2
+import fitz  # PyMuPDF
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
@@ -24,40 +26,58 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'image' not in request.files:
+    if 'file' not in request.files:
         return "No file uploaded", 400
 
-    file = request.files['image']
+    file = request.files['file']
     if file.filename == '':
         return "No file selected", 400
 
-    # Create a unique filename for the uploaded image
-    image_filename = f"{uuid.uuid4().hex}{os.path.splitext(file.filename)[1]}"
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
+    # Create a unique filename for the uploaded file
+    file_extension = os.path.splitext(file.filename)[1].lower()
+    unique_filename = f"{uuid.uuid4().hex}{file_extension}"
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
     file.save(filepath)
 
-    # ---- OCR Extract Text ----
-    # result = reader.readtext(filepath, detail=0)
-    # extracted_text = " ".join(result)
-    # print("OCR Output:", extracted_text)
+    if file_extension == '.pdf':
+        try:
+            pdf_document = fitz.open(filepath)
+            all_latex_codes = []
+            
+            for page_num in range(pdf_document.page_count):
+                page = pdf_document[page_num]
+                pix = page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0))  # Increase resolution
+                img_data = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                
+                # Process each page as an image
+                prompt = f"Extract all handwritten math expressions from this image. Convert this handwritten math expression to LaTeX format. Format: Each formula must be in $$...$$ and placed on a new line. Do NOT use ``` or \\[ \\]. Output only LaTeX equations.\n"
+                try:
+                    response = model.generate_content([img_data, prompt])
+                    page_latex = response.text.strip()
+                    if page_latex:
+                        all_latex_codes.append(page_latex)
+                except Exception as e:
+                    return f"Error processing page {page_num + 1}: {str(e)}", 500
+            
+            pdf_document.close()
+            latex_code = "\n".join(all_latex_codes)
+        except Exception as e:
+            return f"Error processing PDF: {str(e)}", 500
+    else:
+        # Handle single image processing
+        img = Image.open(filepath)
+        prompt = f"Extract all handwritten math expressions from this image. Convert this handwritten math expression to LaTeX format. Format: Each formula must be in $$...$$ and placed on a new line. Do NOT use ``` or \\[ \\]. Output only LaTeX equations.\n"
+        try:
+            response = model.generate_content([img, prompt])
+            latex_code = response.text.strip()
+        except Exception as e:
+            return f"Error from Gemini: {str(e)}", 500
 
-    # ---- Gemini Convert to LaTeX ----
-    img = Image.open(filepath)
-    prompt = f"Extract all handwritten math expressions from this image.Convert this handwritten math expression to LaTeX format. Format: Each formula must be in $$...$$ and placed on a new line.Do NOT use ``` or \\[ \\]. Output only LaTeX equations.\n"
-    try:
-        response = model.generate_content([img, prompt])
-        latex_code = response.text.strip()
-    except Exception as e:
-        latex_code = f"Error from Gemini: {e}"
-
-    # Wrap only if it's not already in math mode
-    if latex_code.startswith("```"):
-        latex_code = latex_code.replace("```latex", "").replace("```", "").strip()
-
+    # Common processing for both PDF and image
     if not latex_code.strip().startswith("$"):
         latex_code = f"${latex_code.strip()}$"
 
-    # Wrap in proper LaTeX structure
+    # Create LaTeX document
     full_latex_code = f"""\\documentclass{{article}}
     \\usepackage{{amsmath}}
     \\usepackage{{amssymb}}
@@ -69,13 +89,14 @@ def upload():
     \\end{{document}}
     """
 
-    filename = f"{uuid.uuid4().hex}.tex"
-    tex_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
+    # Save and process LaTeX file
+    tex_filename = f"{uuid.uuid4().hex}.tex"
+    tex_path = os.path.join(app.config['UPLOAD_FOLDER'], tex_filename)
+    
     with open(tex_path, "w", encoding="utf-8") as f:
         f.write(full_latex_code)
 
-    pdf_filename = filename.replace('.tex', '.pdf')
+    pdf_filename = tex_filename.replace('.tex', '.pdf')
     pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_filename)
 
     try:
@@ -85,10 +106,10 @@ def upload():
 
     return render_template('index.html',
                        latex_code=latex_code,
-                       latex_file=filename,
+                       latex_file=tex_filename,
                        pdf_file=pdf_filename,
                        pdf_url=url_for('static', filename=f'uploads/{pdf_filename}'),
-                       image_url=url_for('static', filename=f'uploads/{image_filename}'))
+                       image_url=url_for('static', filename=f'uploads/{unique_filename}'))
 
 @app.route('/download/<filename>')
 def download_file(filename):

@@ -46,7 +46,25 @@ function handleDrop(e) {
 }
 
 fileInput.addEventListener('change', function(e) {
-    showPreview(this.files[0]);
+    const file = e.target.files[0];
+    const preview = document.getElementById('preview');
+    const fileName = document.getElementById('fileName');
+
+    if (file) {
+        fileName.textContent = file.name;
+        
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Hide preview for PDFs
+            preview.style.display = 'none';
+        }
+    }
 });
 
 function showPreview(file) {
@@ -54,13 +72,18 @@ function showPreview(file) {
     const fileName = document.getElementById('fileName');
     
     if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-            fileName.textContent = file.name;
+        fileName.textContent = file.name;
+        
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
         }
-        reader.readAsDataURL(file);
     }
 }
 

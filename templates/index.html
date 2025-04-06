@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <title>Handwriting to LaTeX</title>
         <link rel="stylesheet" href="/static/style.css" />
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
         <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </head>
     <body>
@@ -14,17 +15,17 @@
 
             <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
                 <div class="upload-container" id="dropZone">
-                    <p>Drag and drop your image here</p>
+                    <p>Drag and drop your image or PDF here</p>
                     <p>- or -</p>
                     <div class="file-input-wrapper">
                         <label class="custom-file-upload">
-                            <input type="file" name="image" accept="image/*" required id="fileInput"/>
+                            <input type="file" name="file" accept="image/*,application/pdf" required id="fileInput"/>
                             Choose File
                         </label>
                     </div>
-                    <img id="preview" class="preview-image" alt="Preview">
+                    <img id="preview" class="preview-image" alt="Preview" style="display: none;">
                     <p id="fileName"></p>
-                    <button type="submit" class="upload-btn">Upload & Convert</button>
+                    <button type="submit" class="upload-btn">Convert to LaTeX</button>
                 </div>
             </form>
 

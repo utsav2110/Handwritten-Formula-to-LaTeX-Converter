@@ -121,6 +121,15 @@ button.theme-toggle {
     border-radius: 50%;
 }
 
+button.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+[data-theme="dark"] button.theme-toggle:hover {
+    background-color: #27261f;
+    transform: scale(1.1);
+}
+
 [data-theme="dark"] button:hover {
     background: #ffed4a;
     transform: translateY(-1px);

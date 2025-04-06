@@ -65,7 +65,15 @@ def upload():
             return f"Error from Gemini: {str(e)}", 500
 
     if not latex_code.strip().startswith("$"):
-        latex_code = f"${latex_code.strip()}$"
+        # Remove any extra whitespace between equations
+        latex_code = '\n'.join(line.strip() for line in latex_code.split('\n') if line.strip())
+        # Ensure each line is properly enclosed in $$ if not already
+        latex_lines = []
+        for line in latex_code.split('\n'):
+            if not line.strip().startswith('$'):
+                line = f'$${line.strip()}$$'
+            latex_lines.append(line)
+        latex_code = '\n'.join(latex_lines)
 
     full_latex_code = f"""\\documentclass{{article}}
     \\usepackage{{amsmath}}

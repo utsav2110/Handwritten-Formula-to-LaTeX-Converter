@@ -49,9 +49,23 @@
                     {% endif %}
                 </div>
                 <p id="copy-status" style="color: green"></p>
+
+                <h3>🔍 Preview:</h3>
+                <div class="preview-container" id="latexPreview">
+                    {{ latex_code | safe }}
+                </div>
+                <div class="button-container">
+                    <button onclick="printPreview()">🖨️ Print Preview</button>
+                </div>
             {% endif %}
 
         </div>
         <script src="/static/script.js"></script>
+        <script>
+            {% if latex_code %}
+                // Trigger MathJax to process the newly added content
+                MathJax.typesetPromise();
+            {% endif %}
+        </script>
     </body>
 </html>

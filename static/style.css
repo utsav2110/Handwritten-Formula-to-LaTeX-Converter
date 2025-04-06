@@ -221,6 +221,22 @@ textarea {
     border: none;
 }
 
+.preview-container {
+    background-color: var(--background-secondary);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    font-size: 1.2em;
+    line-height: 1.6;
+}
+
+[data-theme="dark"] .preview-container {
+    background-color: var(--background-primary);
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
 /* Improve readability on mobile screens */
 @media (max-width: 768px) {
     body {

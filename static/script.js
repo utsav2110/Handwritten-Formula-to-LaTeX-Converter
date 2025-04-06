@@ -105,3 +105,31 @@ themeToggle.addEventListener('click', () => {
 const savedTheme = localStorage.getItem('theme') || 'light';
 root.setAttribute('data-theme', savedTheme);
 themeToggle.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+
+function printPreview() {
+    const printWindow = window.open('', '_blank');
+    const previewContent = document.getElementById('latexPreview').innerHTML;
+    
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>LaTeX Preview</title>
+                <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+                <style>
+                    body { padding: 20px; font-size: 14pt; }
+                    .preview-content { margin: 0 auto; max-width: 800px; }
+                </style>
+            </head>
+            <body>
+                <div class="preview-content">${previewContent}</div>
+            </body>
+        </html>
+    `);
+    
+    printWindow.document.addEventListener('DOMContentLoaded', function() {
+        MathJax.typesetPromise().then(() => {
+            printWindow.print();
+            printWindow.close();
+        });
+    });
+}

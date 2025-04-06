@@ -70,33 +70,5 @@
 
         </div>
         <script src="/static/script.js"></script>
-        <script>
-            // Store uploaded files
-            {% if uploaded_files %}
-            let uploadedFiles = {{ uploaded_files|tojson }};
-            {% else %}
-            let uploadedFiles = [];
-            {% endif %}
-
-            // Cleanup function
-            async function cleanupFiles() {
-                if (uploadedFiles.length > 0) {
-                    try {
-                        await fetch('/cleanup', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ files: uploadedFiles })
-                        });
-                    } catch (error) {
-                        console.error('Cleanup failed:', error);
-                    }
-                }
-            }
-
-            // Call cleanup when user leaves/refreshes
-            window.addEventListener('beforeunload', cleanupFiles);
-        </script>
     </body>
 </html>

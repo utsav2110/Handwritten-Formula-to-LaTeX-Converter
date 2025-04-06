@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_from_directory, url_for, jsonify
+from flask import Flask, render_template, request, send_from_directory, url_for
 import os
 import google.generativeai as genai
 from flask import send_from_directory
@@ -15,31 +15,12 @@ load_dotenv()
 api_key = os.getenv("API_KEY")
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-1.5-pro-latest")
-
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/cleanup', methods=['POST'])
-def cleanup():
-    try:
-        session_files = request.json.get('files', [])
-        for filename in session_files:
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                # Also remove related .aux, .log files for LaTeX
-                base_name = os.path.splitext(filename)[0]
-                for ext in ['.aux', '.log']:
-                    aux_file = os.path.join(app.config['UPLOAD_FOLDER'], f"{base_name}{ext}")
-                    if os.path.exists(aux_file):
-                        os.remove(aux_file)
-        return jsonify({"status": "success"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -128,8 +109,7 @@ def upload():
                        pdf_file=pdf_filename,
                        pdf_url=url_for('static', filename=f'uploads/{pdf_filename}'),
                        image_url=url_for('static', filename=f'uploads/{unique_filename}'),
-                       is_mobile=is_mobile,
-                       uploaded_files=[unique_filename, tex_filename, pdf_filename])
+                       is_mobile=is_mobile)
 
 @app.route('/download/<filename>')
 def download_file(filename):

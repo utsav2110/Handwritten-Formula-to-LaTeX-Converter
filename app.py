@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, send_from_directory, url_for
 import os
+import easyocr
 import google.generativeai as genai
 from flask import send_from_directory
 import uuid

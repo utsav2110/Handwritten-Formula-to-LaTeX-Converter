@@ -105,7 +105,7 @@ Visit `http://127.0.0.1:5000/` in your browser.
 
 <h3> Check out website Live Link </h3>
 
-<h5><a href="https://handwritten-formula-to-latex-converter.onrender.com/" style="font-size: 20px;">Click Here</a></h5>
+<h3><a href="https://handwritten-formula-to-latex-converter.onrender.com/" target="_blank" style="font-size: 24px;">Click Here</a></h3>
 
 <h3> Or </h3>
 

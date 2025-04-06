@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, send_from_directory, url_for, jsonify
 import os
-import easyocr
 import google.generativeai as genai
 from flask import send_from_directory
 import uuid
@@ -17,7 +16,6 @@ api_key = os.getenv("API_KEY")
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-1.5-pro-latest")
 
-reader = easyocr.Reader(['en'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 

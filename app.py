@@ -1,14 +1,11 @@
 from flask import Flask, render_template, request, send_from_directory, url_for
 import os
-import easyocr
-import cv2
 import google.generativeai as genai
 from flask import send_from_directory
 import uuid
 import subprocess
 from PIL import Image
 from dotenv import load_dotenv
-import PyPDF2
 import fitz  # PyMuPDF
 
 # Add user-agent detection

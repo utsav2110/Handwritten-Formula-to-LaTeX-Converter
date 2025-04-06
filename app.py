@@ -7,7 +7,7 @@ import uuid
 import subprocess
 from PIL import Image
 from dotenv import load_dotenv
-import fitz as pymupdf 
+from pdf2image import convert_from_path
 
 # Add user-agent detection
 from user_agents import parse
@@ -47,25 +47,21 @@ def upload():
 
     if file_extension == '.pdf':
         try:
-            pdf_document = pymupdf.open(filepath)
+            # Convert PDF to images
+            images = convert_from_path(filepath)
             all_latex_codes = []
             
-            for page_num in range(pdf_document.page_count):
-                page = pdf_document[page_num]
-                pix = page.get_pixmap(matrix=pymupdf.Matrix(2.0, 2.0))  # Increase resolution
-                img_data = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-                
+            for page_num, img in enumerate(images):
                 # Process each page as an image
                 prompt = f"Extract all handwritten math expressions from this image. Convert this handwritten math expression to LaTeX format. Format: Each formula must be in $$...$$ and placed on a new line. Do NOT use ``` or \\[ \\]. Output only LaTeX equations.\n"
                 try:
-                    response = model.generate_content([img_data, prompt])
+                    response = model.generate_content([img, prompt])
                     page_latex = response.text.strip()
                     if page_latex:
                         all_latex_codes.append(page_latex)
                 except Exception as e:
                     return f"Error processing page {page_num + 1}: {str(e)}", 500
             
-            pdf_document.close()
             latex_code = "\n".join(all_latex_codes)
         except Exception as e:
             return f"Error processing PDF: {str(e)}", 500
@@ -131,3 +127,4 @@ if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     port = int(os.environ.get("PORT", 5000))  # Default to 5000 if not set
     app.run(host="0.0.0.0", port=port)
+    # app.run(debug=True)

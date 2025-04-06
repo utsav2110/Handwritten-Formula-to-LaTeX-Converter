@@ -7,7 +7,7 @@ import uuid
 import subprocess
 from PIL import Image
 from dotenv import load_dotenv
-import fitz  # PyMuPDF
+import fitz as pymupdf 
 
 # Add user-agent detection
 from user_agents import parse
@@ -47,12 +47,12 @@ def upload():
 
     if file_extension == '.pdf':
         try:
-            pdf_document = fitz.open(filepath)
+            pdf_document = pymupdf.open(filepath)
             all_latex_codes = []
             
             for page_num in range(pdf_document.page_count):
                 page = pdf_document[page_num]
-                pix = page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0))  # Increase resolution
+                pix = page.get_pixmap(matrix=pymupdf.Matrix(2.0, 2.0))  # Increase resolution
                 img_data = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
                 
                 # Process each page as an image
@@ -129,4 +129,5 @@ def download_pdf(filename):
 if __name__ == '__main__':
     # Ensure both uploads and static/uploads directories exist
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if not set
+    app.run(host="0.0.0.0", port=port)

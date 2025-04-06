@@ -49,16 +49,22 @@ This project allows users to upload images or PDFs containing handwritten mathem
 📦 Installation
 ---------------
 
+To get started with the **Handwritten Formula to LaTeX Converter**, follow these steps:
 
-```bash
-git clone https://github.com/utsav2110/Handwritten-Formula-to-LaTeX-Converter.git
-```
-```bash
-cd Handwritten-Formula-to-LaTeX-Converter
-```
-```bash
-pip install -r requirements.txt
-```
+1. **Clone the Repository**
+    ```bash
+    git clone https://github.com/utsav2110/Handwritten-Formula-to-LaTeX-Converter.git
+    ```
+
+2. **Navigate to the Project Directory**
+    ```bash
+    cd Handwritten-Formula-to-LaTeX-Converter
+    ```
+
+3. **Install Dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 ▶️ Run the App
 --------------
@@ -94,3 +100,13 @@ Visit `http://127.0.0.1:5000/` in your browser.
 
 ### Light Theme
 ![Light UI](images/4.png)
+
+# Project Live Link
+
+<h3> Check out website Live Link </h3>
+
+<h5><a href="https://handwritten-formula-to-latex-converter.onrender.com/" style="font-size: 20px;">Click Here</a></h5>
+
+<h3> Or </h3>
+
+`https://handwritten-formula-to-latex-converter.onrender.com/`

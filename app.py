@@ -11,6 +11,9 @@ from dotenv import load_dotenv
 import PyPDF2
 import fitz  # PyMuPDF
 
+# Add user-agent detection
+from user_agents import parse
+
 load_dotenv()
 api_key = os.getenv("API_KEY")
 genai.configure(api_key=api_key)
@@ -32,6 +35,11 @@ def upload():
     file = request.files['file']
     if file.filename == '':
         return "No file selected", 400
+
+    # Get user agent
+    user_agent_string = request.headers.get('User-Agent')
+    user_agent = parse(user_agent_string)
+    is_mobile = user_agent.is_mobile
 
     # Create a unique filename for the uploaded file
     file_extension = os.path.splitext(file.filename)[1].lower()
@@ -109,7 +117,8 @@ def upload():
                        latex_file=tex_filename,
                        pdf_file=pdf_filename,
                        pdf_url=url_for('static', filename=f'uploads/{pdf_filename}'),
-                       image_url=url_for('static', filename=f'uploads/{unique_filename}'))
+                       image_url=url_for('static', filename=f'uploads/{unique_filename}'),
+                       is_mobile=is_mobile)
 
 @app.route('/download/<filename>')
 def download_file(filename):
